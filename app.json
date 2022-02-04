@@ -1,34 +1,37 @@
 {
+  "name": "Rajmade",
+  "displayName": "Rajmade",
   "expo": {
-    "name": "rajmade-v2",
-    "slug": "rajmade-v2",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
+    "name": "Rajmade",
+    "icon": "icon.png",
+    "scheme": "rajmade",
+    "slug": "rajmade",
+    "version": "1.0.2",
+    "privacy": "unlisted",
+    "android": {
+      "useNextNotificationsApi": true,
+      "package": "com.ramacoda.rajmade",
+      "versionCode": 4
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
-    "updates": {
-      "fallbackToCacheTimeout": 0
+    "notification": {
+      "icon": "./assets/images/ic_notification.png",
+      "color": "#000000",
+      "androidMode": "default",
+      "androidCollapsedTitle": "default"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "favicon": "./assets/images/favicon.png"
-    }
+    "description": ""
   }
 }

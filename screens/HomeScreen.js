@@ -21,11 +21,12 @@ HomeScreen.navigationOptions = {
 const styles = StyleSheet.create({
     title: {
         fontSize: 30,
+        color: "white",
     },
     container: {
         paddingTop: 30,
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#2d4150",
     },
     developmentModeText: {
         marginBottom: 20,

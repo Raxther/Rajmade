@@ -13,7 +13,7 @@ export default function App() {
 
     const [index, setIndex] = useState(0);
     const [routes] = useState([
-        { key: "album", title: "Roue", icon: "ship-wheel", color: "#6200ee" },
+        { key: "album", title: "Roue", icon: "bullseye-arrow", color: "#6200ee" },
         {
             key: "library",
             title: "Bloc note partagé",
@@ -23,7 +23,7 @@ export default function App() {
         {
             key: "purchased",
             title: "Résumé",
-            icon: "counter",
+            icon: "history",
             color: "#c51162",
         },
     ]);
@@ -43,7 +43,7 @@ export default function App() {
                             library: CalendarScreen,
                             purchased: StatsScreen,
                         })}
-                        sceneAnimationEnabled={false}
+                        shifting={true}
                     />
                 </ThemeProvider>
             </SafeAreaProvider>

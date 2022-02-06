@@ -10,6 +10,7 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Clipboard,
+    ScrollView,
 } from "react-native";
 import { get, send } from "../utils/api";
 import { Calendar, LocaleConfig } from "react-native-calendars";
@@ -66,6 +67,25 @@ const closeRow = (rowMap, rowKey) => {
     }
 };
 
+const theme = {
+    backgroundColor: "#2d4150",
+    calendarBackground: "#2d4150",
+    textSectionTitleColor: "#b6c1cd",
+    monthTextColor: "#b6c1cd",
+    textSectionTitleDisabledColor: "#d9e1e8",
+    selectedDayBackgroundColor: "#00adf5",
+    selectedDayTextColor: "#ffffff",
+    todayTextColor: "#00adf5",
+    dayTextColor: "#b6c1cd",
+    textDisabledColor: "#d9e1e8",
+    dotColor: "#00adf5",
+    selectedDotColor: "#ffffff",
+    disabledArrowColor: "#d9e1e8",
+    textDayFontSize: 14,
+    textMonthFontSize: 16,
+    textDayHeaderFontSize: 12,
+};
+
 export default function Notes() {
     const defaultNotes = [];
     const [markedDates, setMarkedDates] = useState({});
@@ -116,8 +136,8 @@ export default function Notes() {
 
     async function getMarked(month) {
         const date = month && moment([month.year, month.month - 1, month.day]);
-        const rama = { key: "massage", color: "blue" };
-        const jade = { key: "workout", color: "red" };
+        const rama = { key: "massage", color: "#25efdb" };
+        const jade = { key: "workout", color: "#ffaa68" };
         let res = {};
         let start = moment(date).startOf("month").add(-6, "month");
         let marked = await get(
@@ -161,17 +181,20 @@ export default function Notes() {
     }
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <Toast visible={visible} message="Message copié !" />
             <Calendar
                 disableArrowLeft={refreshing}
                 disableArrowRight={refreshing}
+                theme={theme}
                 hideExtraDays
                 markingType={"multi-dot"}
-                onMonthChange={month => {
+                onMonthChange={async month => {
+                    setRefreshing(true);
                     let start = moment(month).startOf("month");
                     setDateSelected(start.format("YYYY-MM-DD"));
-                    getMarked(month);
+                    await getMarked(month);
+                    setRefreshing(false);
                 }}
                 onDayPress={day => {
                     setRefreshing(true);
@@ -192,20 +215,26 @@ export default function Notes() {
                 })}
             />
             <View style={styles.switch}>
-                <Text style={{ paddingLeft: 10 }}>Rama</Text>
+                <Text style={{ paddingLeft: 10, color: "white" }}>Rama</Text>
                 <Switch
-                    trackColor={{ false: "#767577", true: "#81b0ff" }}
+                    trackColor={{ false: "#ffaa68", true: "#25efdb" }}
                     thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-                    ios_backgroundColor="#3e3e3e"
+                    ios_backgroundColor="white"
                     onValueChange={toggleSwitch}
                     value={isEnabled === "Rama"}
                 />
-                <Text style={{ paddingRight: 10 }}>Jade</Text>
+                <Text style={{ paddingRight: 10, color: "white" }}>Jade</Text>
             </View>
             <View style={{ width }}>
                 <TextInput
-                    style={{ height: 40, paddingBottom: 10, paddingLeft: 20 }}
+                    style={{
+                        height: 40,
+                        paddingBottom: 10,
+                        paddingLeft: 20,
+                        color: "white",
+                    }}
                     placeholder="Ecrivez votre note ici !"
+                    placeholderTextColor="#F4F3F4FF"
                     onChangeText={text => setText(text)}
                     value={text}
                     multiline={true}
@@ -229,17 +258,18 @@ export default function Notes() {
                 <Button containerStyle={{ padding: "10px", flex: "auto" }} title="Envoyer une Notification" disabled />
                 <View />
             </View>
-
-            <SectionListBasics
-                handle={handleButtonPress}
-                refreshing={refreshing}
-                setRefreshing={setRefreshing}
-                refresh={refresh}
-                smallLoading={smallLoading}
-                sections={notes}
-                onDelete={onDelete}
-            />
-        </View>
+            <View style={{ paddingBottom: 40 }}>
+                <SectionListBasics
+                    handle={handleButtonPress}
+                    refreshing={refreshing}
+                    setRefreshing={setRefreshing}
+                    refresh={refresh}
+                    smallLoading={smallLoading}
+                    sections={notes}
+                    onDelete={onDelete}
+                />
+            </View>
+        </ScrollView>
     );
 }
 
@@ -315,13 +345,13 @@ function SectionListBasics(props) {
 const styles = StyleSheet.create({
     switch: {
         flexDirection: "row-reverse",
-        alignItems: "flex-end",
+        alignItems: "center",
     },
     container: {
         flex: 1,
         paddingTop: 22,
         paddingBottom: 16,
-        backgroundColor: "white",
+        backgroundColor: "#2d4150",
     },
     sectionHeader: {
         paddingTop: 8,
@@ -330,6 +360,7 @@ const styles = StyleSheet.create({
         paddingBottom: 2,
         fontSize: 14,
         fontWeight: "bold",
+        color: "white",
     },
     item: {
         justifyContent: "flex-start",
@@ -337,17 +368,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         minHeight: 44,
         maxWidth: "94%",
+        color: "white",
     },
     deleteItem: {
         overflow: "visible",
         alignSelf: "center",
     },
     backTextWhite: {
-        color: "#FFF",
+        color: "#2d4150",
     },
     rowFront: {
         paddingBottom: 8,
-        backgroundColor: "white",
+        backgroundColor: "#2d4150",
         justifyContent: "flex-start",
         minHeight: 44,
     },

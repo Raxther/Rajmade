@@ -8,14 +8,12 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const FitImage = props => {
     const innerCircleRadius = 15;
-    const innerCircleFillPercentage =
-        props.data.count["Rama"] && (props.data.count["Rama"]["COUNT notes"] * 100) / props.data.total;
+    const innerCircleFillPercentage = props.data.totalRama && (props.data.totalRama * 100) / props.data.total;
     const innerCirclePerimeter = 2 * Math.PI * innerCircleRadius;
     const innerCircleStrokeDashOffset = innerCirclePerimeter - (innerCirclePerimeter * innerCircleFillPercentage) / 100;
 
     const outerCircleRadius = 17;
-    const outerCircleFillPercentage =
-        props.data.count["Jade"] && (props.data.count["Jade"]["COUNT notes"] * 100) / props.data.total;
+    const outerCircleFillPercentage = props.data.totalJade && (props.data.totalJade * 100) / props.data.total;
     const outerCirclePerimeter = 2 * Math.PI * outerCircleRadius;
     const outerCircleStrokeDashOffset = outerCirclePerimeter - (outerCirclePerimeter * outerCircleFillPercentage) / 100;
 

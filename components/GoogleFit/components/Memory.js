@@ -20,7 +20,7 @@ const Memory = props => {
                 {description.map(note => {
                     return (
                         <Text key={note.message} style={{ color: "#9a9ba1", fontSize: 15, marginBottom: 20 }}>
-                            {note.message + " (" + note.author + " )"}
+                            {note.message.split("\\n").join("\n") + " ( " + note.author.name + " )"}
                         </Text>
                     );
                 })}

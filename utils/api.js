@@ -1,4 +1,10 @@
-const baseUrl = "https://rajmade-7d1e.restdb.io/rest/";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "https://guwejrpkgiyanvigovbl.supabase.co";
+const supabaseAnonKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYyMjAxNTE0NSwiZXhwIjoxOTM3NTkxMTQ1fQ.JI5iOVNCL177xWLBqjDqSuQ3Faxvq2MaY8SFGVSukH0";
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 let myHeaders = new Headers();
 myHeaders.append("x-apikey", "5e958416436377171a0c2353");
@@ -9,38 +15,21 @@ notificationHeader.append("Content-Type", "application/json");
 notificationHeader.append("Accept", "application/json");
 notificationHeader.append("Accept-encoding", "gzip, deflate");
 
-let requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
+export const getDayData = async (day = new Date().toISOString()) => {
+    let { data: messages, error } = await supabase
+        .from("messages")
+        .select(
+            `
+            message,
+            date,
+            id,
+            author (
+              name
+            )
+      `,
+        )
+        .order("date", { ascending: false })
+        .lte("date", day)
+        .gte("date", day);
+    return { data: messages, error };
 };
-
-const handleRequest = async request => {
-    if (request.status === 400) {
-        let res = await request.json();
-        throw new Error(res.message);
-    } else {
-        const res = await request.json();
-        return res;
-    }
-};
-
-let getHeaders = () => {
-    return myHeaders;
-};
-
-export async function get(url, annexe = "notes") {
-    let request = await fetch(baseUrl + annexe + "\n" + url, {
-        headers: getHeaders(),
-    });
-    return handleRequest(request);
-}
-
-export async function send(url, fields, method = "POST", annexe = "notes") {
-    let request = await fetch(baseUrl + annexe + "\n" + url, {
-        method,
-        body: JSON.stringify(fields),
-        headers: getHeaders(),
-    });
-    return handleRequest(request);
-}

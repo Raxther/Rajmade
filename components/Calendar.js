@@ -12,7 +12,7 @@ import {
     Clipboard,
     ScrollView,
 } from "react-native";
-import { get, send } from "../utils/api";
+import { supabase, getDayData } from "../utils/api";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment/moment";
 import { SwipeListView } from "react-native-swipe-list-view";
@@ -102,7 +102,26 @@ export default function Notes() {
     };
     const [width, setWidth] = useState("99%");
 
-    useEffect(() => {
+    const getData = async (start = new Date().toISOString()) => {
+        let { data: messages, error } = await supabase
+            .from("messages")
+            .select(
+                `
+            message,
+            date,
+            id,
+            author (
+              name
+            )
+      `,
+            )
+            .order("date", { ascending: false })
+            .lte("date", start);
+
+        return { data: messages, error };
+    };
+
+    useEffect(async () => {
         getMarked();
         refresh();
         const timer = setTimeout(() => {
@@ -118,35 +137,51 @@ export default function Notes() {
 
     async function onNewNote() {
         setLoading(true);
-        await send("", {
-            author: isEnabled,
-            message: text,
-            date: new Date(dateSelected),
-        });
+        await supabase.from("messages").insert([
+            {
+                author: isEnabled === "Rama" ? 1 : 2,
+                message: text,
+                date: new Date(dateSelected),
+            },
+        ]);
         setText("");
         refresh(dateSelected);
     }
 
     async function onDelete(id) {
         setSmallLoading(id);
-        await send("/" + id, {}, "DELETE");
+        await supabase.from("messages").delete().eq("id", id);
         await refresh(dateSelected);
         setSmallLoading("");
     }
+
+    const formatDate = dateString => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return `${year}-${month}-${day}`;
+    };
 
     async function getMarked(month) {
         const date = month && moment([month.year, month.month - 1, month.day]);
         const rama = { key: "massage", color: "#25efdb" };
         const jade = { key: "workout", color: "#ffaa68" };
         let res = {};
-        let start = moment(date).startOf("month").add(-6, "month");
-        let marked = await get(
-            '?q={"date":{"$gte":{"$date":"' +
-                start.format("YYYY-MM-DD") +
-                '"},"$lte":{"$date":"' +
-                start.add(24, "month").format("YYYY-MM-DD") +
-                '"}}}&h={"$groupby":["$DATE.YYYY-MM-DD:date", "author"]}',
-        );
+        let start = moment(date).startOf("month").add(2, "month").format("YYYY-MM-DD");
+        const { data: messages, error } = await getData(month ? start : undefined);
+        const marked = (messages || []).reduce((acc, curr) => {
+            const date = formatDate(curr.date);
+            const authorName = curr.author.name;
+            if (!acc[date]) {
+                acc[date] = {};
+            }
+            if (!acc[date][authorName]) {
+                acc[date][authorName] = [];
+            }
+            acc[date][authorName].push(curr);
+            return acc;
+        }, {});
         Object.keys(marked).map(date => {
             let dots = [];
             let dates = Object.keys(marked[date]);
@@ -167,13 +202,8 @@ export default function Notes() {
             day = dateSelected;
         }
         if (dateSelected) {
-            notes = await get(
-                '?q={"date":{"$gte":{"$date":"' +
-                    day +
-                    '"},"$lt":{"$date":"' +
-                    moment(day).add(1, "d").format("YYYY-MM-DD") +
-                    '"}}}&h={"$orderby": {"date": -1}}',
-            );
+            const { data: messages } = await getDayData(day);
+            notes = messages;
         }
         setNote(notes || []);
         setLoading(false);
@@ -279,14 +309,15 @@ function SectionListBasics(props) {
         props.handle();
     };
 
-    var groupBy = function (xs, key) {
+    var groupBy = function (xs, key, sub) {
         return xs.reduce(function (rv, x) {
-            (rv[x[key]] = rv[x[key]] || []).push(x);
+            (rv[x[key][sub]] = rv[x[key][sub]] || []).push(x);
             return rv;
         }, []);
     };
-    var sections = groupBy(props.sections, "author");
-    let data = Object.keys(sections).map(author => {
+    const sections = groupBy(props.sections, "author", "name");
+
+    let data = Object.keys(sections).map((author, i) => {
         return { title: author, data: sections[author].map(note => note) };
     });
 
@@ -295,13 +326,13 @@ function SectionListBasics(props) {
             refreshControl={props.refreshControl}
             useSectionList
             sections={data}
-            keyExtractor={item => item._id}
+            keyExtractor={item => item.id}
             renderItem={({ item }) =>
-                item._id === props.smallLoading ? (
+                item.id === props.smallLoading ? (
                     <ActivityIndicator style={{ paddingBottom: 10 }} size="large" color="#0000ff" />
                 ) : (
                     <View style={styles.rowFront}>
-                        <Text style={styles.item}>{item.message}</Text>
+                        <Text style={styles.item}>{item.message.split("\\n").join("\n")}</Text>
                     </View>
                 )
             }
@@ -313,7 +344,7 @@ function SectionListBasics(props) {
                     <TouchableOpacity
                         style={[styles.backRightBtn, styles.backRightBtnLeft]}
                         onPress={() => {
-                            closeRow(rowMap, data.item._id);
+                            closeRow(rowMap, data.item.id);
                             writeToClipboard(data.item.message);
                         }}
                     >
@@ -322,8 +353,8 @@ function SectionListBasics(props) {
                     <TouchableOpacity
                         style={[styles.backRightBtn, styles.backRightBtnRight]}
                         onPress={() => {
-                            closeRow(rowMap, data.item._id);
-                            props.onDelete(data.item._id);
+                            closeRow(rowMap, data.item.id);
+                            props.onDelete(data.item.id);
                         }}
                     >
                         <Ionicons name="trash" color="white" />

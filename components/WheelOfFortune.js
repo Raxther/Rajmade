@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { View, Dimensions, Animated } from "react-native";
 import * as d3Shape from "d3-shape";
 import randomColor from "randomcolor";
@@ -149,6 +149,17 @@ export default function Wheel(props) {
             </View>
         );
     };
+
+    const trigger = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    trigger.setMinutes(0);
+    trigger.setSeconds(0);
+
+    Notifications.scheduleNotificationAsync({
+        content: {
+            title: "Viens ecrire une nouvelle note stp :)",
+        },
+        trigger,
+    });
 
     return (
         <PanGestureHandler onHandlerStateChange={onPan}>

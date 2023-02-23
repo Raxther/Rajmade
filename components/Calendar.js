@@ -121,7 +121,7 @@ export default function Notes() {
         return { data: messages, error };
     };
 
-    useEffect(async () => {
+    useEffect(() => {
         getMarked();
         refresh();
         const timer = setTimeout(() => {

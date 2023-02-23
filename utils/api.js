@@ -1,3 +1,5 @@
+import "react-native-url-polyfill/auto";
+
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = "https://guwejrpkgiyanvigovbl.supabase.co";

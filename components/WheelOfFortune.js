@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { View, Dimensions, Animated } from "react-native";
 import * as d3Shape from "d3-shape";
 import randomColor from "randomcolor";
@@ -32,7 +32,7 @@ const makeWheel = () => {
 
 export default function Wheel(props) {
     let wheel = makeWheel();
-    let angle = new Animated.Value(0);
+    const angle = useRef(new Animated.Value(0)).current;
 
     let onPan = ({ nativeEvent }) => {
         if (nativeEvent.state === State.END) {
@@ -45,7 +45,7 @@ export default function Wheel(props) {
                 velocity: (direction * velocityY * (Math.random() + 1)) / 2000,
                 deceleration: 0.999,
                 useNativeDriver: true,
-            });
+            }).start();
         }
     };
 
@@ -149,17 +149,6 @@ export default function Wheel(props) {
             </View>
         );
     };
-
-    const trigger = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    trigger.setMinutes(0);
-    trigger.setSeconds(0);
-
-    Notifications.scheduleNotificationAsync({
-        content: {
-            title: "Viens ecrire une nouvelle note stp :)",
-        },
-        trigger,
-    });
 
     return (
         <PanGestureHandler onHandlerStateChange={onPan}>

@@ -7,6 +7,7 @@ import { useState } from "react";
 import HomeScreen from "./screens/HomeScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import StatsScreen from "./screens/StatsScreen";
+import FavoriteScreen from "./screens/FavoriteScreen";
 
 export default function App() {
     const isLoadingComplete = useCachedResources();
@@ -26,6 +27,12 @@ export default function App() {
             icon: "history",
             color: "#c51162",
         },
+        {
+            key: "favorite",
+            title: "Favoris",
+            icon: "heart",
+            color: "darkgreen",
+        },
     ]);
 
     if (!isLoadingComplete) {
@@ -42,6 +49,7 @@ export default function App() {
                             album: HomeScreen,
                             library: CalendarScreen,
                             purchased: StatsScreen,
+                            favorite: FavoriteScreen,
                         })}
                         shifting={true}
                     />

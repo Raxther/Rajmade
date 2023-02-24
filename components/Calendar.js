@@ -9,6 +9,7 @@ import {
     StyleSheet,
     ActivityIndicator,
     TouchableOpacity,
+    TouchableHighlight,
     Clipboard,
     ScrollView,
 } from "react-native";
@@ -17,6 +18,8 @@ import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment/moment";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { Ionicons } from "@expo/vector-icons";
+
+export const formatMessage = item => item.split("\\n").join("\n");
 
 LocaleConfig.locales["fr"] = {
     monthNames: [
@@ -97,6 +100,7 @@ export default function Notes() {
     const [smallLoading, setSmallLoading] = useState("");
     const [isEnabled, setIsEnabled] = useState("Jade");
     const [visible, setVisible] = useState(false);
+    const [visibleFav, setVisibleFav] = useState(false);
     const toggleSwitch = () => {
         setIsEnabled(previousState => (previousState === "Jade" ? "Rama" : "Jade"));
     };
@@ -134,6 +138,11 @@ export default function Notes() {
         setVisible(true);
         setVisible(false);
     }
+
+    const handleDoubleButtonPress = () => {
+        setVisibleFav(true);
+        setVisibleFav(false);
+    };
 
     async function onNewNote() {
         setLoading(true);
@@ -213,6 +222,7 @@ export default function Notes() {
     return (
         <ScrollView style={styles.container}>
             <Toast visible={visible} message="Message copié !" />
+            <Toast visible={visibleFav} message="Ajouté au favoris" />
             <Calendar
                 disableArrowLeft={refreshing}
                 disableArrowRight={refreshing}
@@ -291,6 +301,11 @@ export default function Notes() {
             <View style={{ paddingBottom: 40 }}>
                 <SectionListBasics
                     handle={handleButtonPress}
+                    handleDouble={() => {
+                        setVisibleFav(true);
+                        setVisibleFav(false);
+                    }}
+                    isEnabled={isEnabled}
                     refreshing={refreshing}
                     setRefreshing={setRefreshing}
                     refresh={refresh}
@@ -309,6 +324,18 @@ function SectionListBasics(props) {
         props.handle();
     };
 
+    var likeNote = async value => {
+        const { data, error } = await supabase.from("likes").upsert(
+            {
+                liked_by: props.isEnabled === "Rama" ? 1 : 2,
+                note: value.id,
+                identifier: value.id + (props.isEnabled === "Rama" ? 1 : 2),
+            },
+            { onConflict: ["identifier"] },
+        );
+        props.handleDouble();
+    };
+
     var groupBy = function (xs, key, sub) {
         return xs.reduce(function (rv, x) {
             (rv[x[key][sub]] = rv[x[key][sub]] || []).push(x);
@@ -321,6 +348,17 @@ function SectionListBasics(props) {
         return { title: author, data: sections[author].map(note => note) };
     });
 
+    var lastTap = null;
+    const handleDoubleTap = item => {
+        const now = Date.now();
+        const DOUBLE_PRESS_DELAY = 300;
+        if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
+            likeNote(item);
+        } else {
+            lastTap = now;
+        }
+    };
+
     return (
         <SwipeListView
             refreshControl={props.refreshControl}
@@ -331,21 +369,25 @@ function SectionListBasics(props) {
                 item.id === props.smallLoading ? (
                     <ActivityIndicator style={{ paddingBottom: 10 }} size="large" color="#0000ff" />
                 ) : (
-                    <View style={styles.rowFront}>
-                        <Text style={styles.item}>{item.message.split("\\n").join("\n")}</Text>
-                    </View>
+                    <TouchableHighlight
+                        onPress={() => handleDoubleTap(item)}
+                        onLongPress={() => {
+                            writeToClipboard(formatMessage(item.message));
+                        }}
+                    >
+                        <View style={styles.rowFront}>
+                            <Text style={styles.item}>{formatMessage(item.message)}</Text>
+                        </View>
+                    </TouchableHighlight>
                 )
             }
             renderHiddenItem={(data, rowMap) => (
                 <View style={styles.rowBack}>
-                    <Text>
-                        <Ionicons size={18} name="heart" type="font-awesome" color="red" />
-                    </Text>
                     <TouchableOpacity
                         style={[styles.backRightBtn, styles.backRightBtnLeft]}
                         onPress={() => {
                             closeRow(rowMap, data.item.id);
-                            writeToClipboard(data.item.message);
+                            writeToClipboard(formatMessage(data.item.message));
                         }}
                     >
                         <Ionicons name="clipboard" color="white" />
@@ -359,6 +401,9 @@ function SectionListBasics(props) {
                     >
                         <Ionicons name="trash" color="white" />
                     </TouchableOpacity>
+                    <Text>
+                        <Ionicons size={18} name="heart" type="font-awesome" color="red" />
+                    </Text>
                 </View>
             )}
             renderSectionHeader={({ section }) => (

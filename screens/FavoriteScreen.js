@@ -5,17 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { formatMessage } from "../components/Calendar";
 
 const FavoriteScreen = () => {
-    const [favorites, setFavorites] = useState([
-        {
-            id: "1",
-            name: "J'aime beaucoup les pizzas c'est un truc de ouf j'adore",
-            author: "John Doe",
-            date: "2023-02-24",
-        },
-        { id: "2", name: "Ice cream", author: "Jane Smith", date: "2023-02-22" },
-        { id: "3", name: "Tacos", author: "Bob Johnson", date: "2023-02-20" },
-        { id: "4", name: "Sushi", author: "Alice Lee", date: "2023-02-18" },
-    ]);
+    const [favorites, setFavorites] = useState([]);
     const [newFavorite, setNewFavorite] = useState("");
     const [newAuthor, setNewAuthor] = useState("");
     const [newDate, setNewDate] = useState("");
@@ -60,7 +50,6 @@ const FavoriteScreen = () => {
     useEffect(() => {
         getData();
     }, []);
-    console.log(favorites);
     const renderItem = ({ item }) => (
         <TouchableOpacity style={styles.item} onPress={() => handleDeleteFavorite(item.id)}>
             <View style={styles.leftContainer}>

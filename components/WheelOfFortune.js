@@ -150,7 +150,7 @@ export default function Wheel(props) {
         );
     };
 
-    const trigger = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const trigger = new Date(Date.now() + 60 * 60 * 1000);
     trigger.setMinutes(0);
     trigger.setSeconds(0);
 

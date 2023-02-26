@@ -51,8 +51,10 @@ export default function StatsScreen() {
             .limit(1);
         const lastYear = moment().add(-1, "y").startOf("day").format("YYYY-MM-DD");
         const lastYear2 = moment().add(-2, "y").startOf("day").format("YYYY-MM-DD");
+        const lastYear3 = moment().add(-3, "y").startOf("day").format("YYYY-MM-DD");
         const { data: memories1 } = await getDayData(lastYear);
         const { data: memories2 } = await getDayData(lastYear2);
+        const { data: memories3 } = await getDayData(lastYear3);
 
         setData(
             Object.assign({}, data, {
@@ -62,6 +64,7 @@ export default function StatsScreen() {
                 randomMessage,
                 memories1,
                 memories2,
+                memories3,
             }),
         );
     }

@@ -1,9 +1,12 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableHighlight, View } from "react-native";
 import moment from "moment/moment";
+import { formatMessage } from "../../Calendar";
+import { useAppContext } from "../../../context/UserContext";
 
 const Memory = props => {
     const { name, description } = props;
+    const { handleDoubleTap, writeToClipboard } = useAppContext();
     return (
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <View>
@@ -19,9 +22,17 @@ const Memory = props => {
                 </Text>
                 {description.map(note => {
                     return (
-                        <Text key={note.message} style={{ color: "#9a9ba1", fontSize: 15, marginBottom: 20 }}>
-                            {note.message.split("\\n").join("\n") + " ( " + note.author.name + " )"}
-                        </Text>
+                        <TouchableHighlight
+                            key={note.id}
+                            onPress={() => handleDoubleTap(note)}
+                            onLongPress={() => {
+                                writeToClipboard(formatMessage(note.message));
+                            }}
+                        >
+                            <Text style={{ color: "#9a9ba1", fontSize: 15, marginBottom: 20 }}>
+                                {formatMessage(note.message) + " ( " + note.author.name + " )"}
+                            </Text>
+                        </TouchableHighlight>
                     );
                 })}
             </View>

@@ -1,10 +1,13 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Text, TouchableHighlight, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import moment from "moment/moment";
+import { formatMessage } from "../../Calendar";
+import { useAppContext } from "../../../context/UserContext";
 
 const AdditionalStats = props => {
     const { name, description, nodate } = props;
+    const { handleDoubleTap, writeToClipboard } = useAppContext();
     return (
         <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
             <View>
@@ -18,12 +21,16 @@ const AdditionalStats = props => {
                 >
                     {name + (description && !nodate ? " ( le " + moment(description.date).format("DD/MM") + " )" : "")}
                 </Text>
-                <Text style={{ color: "#9a9ba1", fontSize: 15, marginBottom: 20 }}>
-                    {description && description.message ? description.message : "Chargement en cours ..."}
-                </Text>
-            </View>
-            <View style={{ justifyContent: "center" }}>
-                <Ionicons name={"ios-arrow-forward"} size={30} color="#9a9ba1" />
+                <TouchableHighlight
+                    onPress={() => handleDoubleTap(description)}
+                    onLongPress={() => {
+                        writeToClipboard(formatMessage(description.message));
+                    }}
+                >
+                    <Text style={{ color: "#9a9ba1", fontSize: 15, marginBottom: 20 }}>
+                        {description && description.message ? description.message : "Chargement en cours ..."}
+                    </Text>
+                </TouchableHighlight>
             </View>
         </View>
     );

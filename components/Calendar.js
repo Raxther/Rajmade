@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+
 import {
     ToastAndroid,
     Switch,
@@ -18,6 +19,7 @@ import { Calendar, LocaleConfig } from "react-native-calendars";
 import moment from "moment/moment";
 import { SwipeListView } from "react-native-swipe-list-view";
 import { Ionicons } from "@expo/vector-icons";
+import { useAppContext } from "../context/UserContext";
 
 export const formatMessage = item => item.split("\\n").join("\n");
 
@@ -56,14 +58,6 @@ LocaleConfig.locales["fr"] = {
 };
 LocaleConfig.defaultLocale = "fr";
 
-const Toast = props => {
-    if (props.visible) {
-        ToastAndroid.showWithGravityAndOffset(props.message, ToastAndroid.LONG, ToastAndroid.BOTTOM, 25, 50);
-        return null;
-    }
-    return null;
-};
-
 const closeRow = (rowMap, rowKey) => {
     if (rowMap[rowKey]) {
         rowMap[rowKey].closeRow();
@@ -91,6 +85,7 @@ const theme = {
 
 export default function Notes() {
     const defaultNotes = [];
+    const { user: isEnabled, setUser: setIsEnabled, visible, visibleFav } = useAppContext();
     const [markedDates, setMarkedDates] = useState({});
     const [dateSelected, setDateSelected] = useState(moment().format("YYYY-MM-DD"));
     const [text, setText] = useState("");
@@ -98,9 +93,6 @@ export default function Notes() {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(true);
     const [smallLoading, setSmallLoading] = useState("");
-    const [isEnabled, setIsEnabled] = useState("Jade");
-    const [visible, setVisible] = useState(false);
-    const [visibleFav, setVisibleFav] = useState(false);
     const toggleSwitch = () => {
         setIsEnabled(previousState => (previousState === "Jade" ? "Rama" : "Jade"));
     };
@@ -133,16 +125,6 @@ export default function Notes() {
         }, 100);
         return () => clearTimeout(timer);
     }, [width]);
-
-    function handleButtonPress() {
-        setVisible(true);
-        setVisible(false);
-    }
-
-    const handleDoubleButtonPress = () => {
-        setVisibleFav(true);
-        setVisibleFav(false);
-    };
 
     async function onNewNote() {
         setLoading(true);
@@ -221,8 +203,6 @@ export default function Notes() {
 
     return (
         <ScrollView style={styles.container}>
-            <Toast visible={visible} message="Message copié !" />
-            <Toast visible={visibleFav} message="Ajouté au favoris" />
             <Calendar
                 disableArrowLeft={refreshing}
                 disableArrowRight={refreshing}
@@ -300,12 +280,6 @@ export default function Notes() {
             </View>
             <View style={{ paddingBottom: 40 }}>
                 <SectionListBasics
-                    handle={handleButtonPress}
-                    handleDouble={() => {
-                        setVisibleFav(true);
-                        setVisibleFav(false);
-                    }}
-                    isEnabled={isEnabled}
                     refreshing={refreshing}
                     setRefreshing={setRefreshing}
                     refresh={refresh}
@@ -319,22 +293,15 @@ export default function Notes() {
 }
 
 function SectionListBasics(props) {
-    var writeToClipboard = async value => {
-        await Clipboard.setString(value);
-        props.handle();
-    };
-
-    var likeNote = async value => {
-        const { data, error } = await supabase.from("likes").upsert(
-            {
-                liked_by: props.isEnabled === "Rama" ? 1 : 2,
-                note: value.id,
-                identifier: value.id + (props.isEnabled === "Rama" ? 1 : 2),
-            },
-            { onConflict: ["identifier"] },
-        );
-        props.handleDouble();
-    };
+    const {
+        user: isEnabled,
+        setUser: setIsEnabled,
+        handleDoubleTap,
+        likeNote,
+        writeToClipboard,
+        visible,
+        visibleFav,
+    } = useAppContext();
 
     var groupBy = function (xs, key, sub) {
         return xs.reduce(function (rv, x) {
@@ -347,17 +314,6 @@ function SectionListBasics(props) {
     let data = Object.keys(sections).map((author, i) => {
         return { title: author, data: sections[author].map(note => note) };
     });
-
-    var lastTap = null;
-    const handleDoubleTap = item => {
-        const now = Date.now();
-        const DOUBLE_PRESS_DELAY = 300;
-        if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
-            likeNote(item);
-        } else {
-            lastTap = now;
-        }
-    };
 
     return (
         <SwipeListView
@@ -482,5 +438,11 @@ const styles = StyleSheet.create({
     backRightBtnRight: {
         backgroundColor: "#c51162",
         right: 0,
+    },
+    heart: {
+        position: "absolute",
+        top: "40%",
+        left: "25%",
+        zIndex: 9999,
     },
 });

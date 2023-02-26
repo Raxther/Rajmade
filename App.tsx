@@ -8,6 +8,7 @@ import HomeScreen from "./screens/HomeScreen";
 import CalendarScreen from "./screens/CalendarScreen";
 import StatsScreen from "./screens/StatsScreen";
 import FavoriteScreen from "./screens/FavoriteScreen";
+import { AppStateProvider } from "./context/UserContext";
 
 export default function App() {
     const isLoadingComplete = useCachedResources();
@@ -31,7 +32,7 @@ export default function App() {
             key: "favorite",
             title: "Favoris",
             icon: "heart",
-            color: "darkgreen",
+            color: "#D671AD",
         },
     ]);
 
@@ -40,20 +41,22 @@ export default function App() {
     } else {
         return (
             <SafeAreaProvider>
-                <ThemeProvider>
-                    <Header centerComponent={{ text: "RAJMADE", style: { color: "#fff" } }} />
-                    <BottomNavigation
-                        navigationState={{ index, routes }}
-                        onIndexChange={index => setIndex(index)}
-                        renderScene={BottomNavigation.SceneMap({
-                            album: HomeScreen,
-                            library: CalendarScreen,
-                            purchased: StatsScreen,
-                            favorite: FavoriteScreen,
-                        })}
-                        shifting={true}
-                    />
-                </ThemeProvider>
+                <AppStateProvider>
+                    <ThemeProvider>
+                        <Header centerComponent={{ text: "RAJMADE", style: { color: "#fff" } }} />
+                        <BottomNavigation
+                            navigationState={{ index, routes }}
+                            onIndexChange={index => setIndex(index)}
+                            renderScene={BottomNavigation.SceneMap({
+                                album: HomeScreen,
+                                library: CalendarScreen,
+                                purchased: StatsScreen,
+                                favorite: FavoriteScreen,
+                            })}
+                            shifting={true}
+                        />
+                    </ThemeProvider>
+                </AppStateProvider>
             </SafeAreaProvider>
         );
     }

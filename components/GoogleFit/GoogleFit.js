@@ -56,12 +56,17 @@ const GoogleFit = props => {
             <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                 <AdditionalStats name="Note aléatoire" description={props.data.randomMessage[0]} />
             </View>
-            {props.data.memories2.length > 0 && (
+            {props.data.memories3?.length > 0 && (
+                <View style={{ paddingLeft: 20, paddingRight: 20 }}>
+                    <Memory name="Il y a 3 ans" description={props.data.memories3} />
+                </View>
+            )}
+            {props.data.memories2?.length > 0 && (
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                     <Memory name="Il y a 2 ans" description={props.data.memories2} />
                 </View>
             )}
-            {props.data.memories1.length > 0 && (
+            {props.data.memories1?.length > 0 && (
                 <View style={{ paddingLeft: 20, paddingRight: 20 }}>
                     <Memory name="Il y a 1 an" description={props.data.memories1} />
                 </View>

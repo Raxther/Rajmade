@@ -6,7 +6,7 @@
     "icon": "icon.png",
     "scheme": "rajmade",
     "slug": "rajmade",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "privacy": "unlisted",
     "android": {
       "useNextNotificationsApi": true,

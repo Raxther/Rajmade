@@ -8,7 +8,6 @@ const { width } = Dimensions.get("screen");
 const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const oneTurn = 360;
 const knobFill = randomColor({ hue: "purple" });
-import * as Notifications from "expo-notifications";
 
 const numberOfsegment = characters.length;
 const makeWheel = () => {
@@ -149,17 +148,6 @@ export default function Wheel(props) {
             </View>
         );
     };
-
-    const trigger = new Date(Date.now() + 60 * 60 * 1000);
-    trigger.setMinutes(0);
-    trigger.setSeconds(0);
-
-    Notifications.scheduleNotificationAsync({
-        content: {
-            title: "Viens ecrire une nouvelle note stp :)",
-        },
-        trigger,
-    });
 
     return (
         <PanGestureHandler onHandlerStateChange={onPan}>

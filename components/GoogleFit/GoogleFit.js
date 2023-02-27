@@ -80,7 +80,7 @@ const GoogleFit = props => {
                         marginBottom: 5,
                     }}
                 >
-                    v1.3.2
+                    v1.4.1
                 </Text>
             </View>
         </ScrollView>

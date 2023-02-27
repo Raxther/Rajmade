@@ -261,22 +261,13 @@ export default function Notes() {
                     numberOfLines={4}
                 />
             </View>
-            <View
-                style={{
-                    flexDirection: "row",
-                    display: "flex",
-                    justifyContent: "space-between",
-                }}
-            >
-                <View />
+            <View style={{ paddingLeft: 10, paddingRight: 10 }}>
                 <Button
                     color="green"
                     title="Nouvelle note"
                     onPress={() => onNewNote()}
                     disabled={loading || refreshing}
                 />
-                <Button containerStyle={{ padding: "10px", flex: "auto" }} title="Envoyer une Notification" disabled />
-                <View />
             </View>
             <View style={{ paddingBottom: 40 }}>
                 <SectionListBasics

@@ -1,6 +1,6 @@
 {
   "name": "rajmade-v",
-  "version": "1.0.1",
+  "version": "1.0.5",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
@@ -31,6 +31,7 @@
     "expo-font": "~10.2.0",
     "expo-linking": "~3.2.4",
     "expo-notifications": "~0.16.1",
+    "expo-permissions": "~13.2.0",
     "expo-splash-screen": "~0.16.2",
     "expo-status-bar": "~1.4.0",
     "expo-updates": "~0.14.7",

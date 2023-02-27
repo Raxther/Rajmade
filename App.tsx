@@ -9,6 +9,11 @@ import CalendarScreen from "./screens/CalendarScreen";
 import StatsScreen from "./screens/StatsScreen";
 import FavoriteScreen from "./screens/FavoriteScreen";
 import { AppStateProvider } from "./context/UserContext";
+import { registerRootComponent } from "expo";
+import * as Notifications from "expo-notifications";
+import * as Permissions from "expo-permissions";
+import Constants from "expo-constants";
+import { supabase } from "./utils/api";
 
 export default function App() {
     const isLoadingComplete = useCachedResources();
@@ -35,6 +40,51 @@ export default function App() {
             color: "#D671AD",
         },
     ]);
+
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: false,
+            shouldSetBadge: true,
+        }),
+    });
+
+    async function getNotificationPermission() {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (Constants.isDevice && status === "granted") {
+            console.log("Notification permissions granted.");
+        }
+    }
+
+    async function clearNotifications() {
+        await Notifications.dismissAllNotificationsAsync();
+    }
+
+    async function setNotification() {
+        const { data: message, error } = await supabase
+            .from("notification")
+            .select(
+                `
+                message
+      `,
+            )
+            .single();
+
+        const trigger = new Date(Date.now() + 8 * 60 * 60 * 1000);
+        trigger.setMinutes(0);
+        trigger.setSeconds(0);
+
+        Notifications.scheduleNotificationAsync({
+            content: {
+                title: message.message || "Viens ecrire une nouvelle note stp :)",
+            },
+            trigger,
+        });
+    }
+
+    getNotificationPermission();
+    clearNotifications();
+    setNotification();
 
     if (!isLoadingComplete) {
         return null;

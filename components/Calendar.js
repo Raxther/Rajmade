@@ -266,7 +266,7 @@ export default function Notes() {
                     color="green"
                     title="Nouvelle note"
                     onPress={() => onNewNote()}
-                    disabled={loading || refreshing}
+                    disabled={loading || refreshing || !text}
                 />
             </View>
             <View style={{ paddingBottom: 40 }}>

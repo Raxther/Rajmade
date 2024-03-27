@@ -6,12 +6,12 @@
     "icon": "icon.png",
     "scheme": "rajmade",
     "slug": "rajmade",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "privacy": "unlisted",
     "android": {
       "useNextNotificationsApi": true,
       "package": "com.ramacoda.rajmade",
-      "versionCode": 4
+      "versionCode": 5
     },
     "platforms": [
       "ios",

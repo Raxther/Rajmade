@@ -1,6 +1,5 @@
 import React from "react";
 import { Text, TouchableHighlight, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import moment from "moment/moment";
 import { formatMessage } from "../../Calendar";
 import { useAppContext } from "../../../context/UserContext";
@@ -19,7 +18,7 @@ const AdditionalStats = props => {
                         marginBottom: 5,
                     }}
                 >
-                    {name + (description && !nodate ? " ( le " + moment(description.date).format("DD/MM") + " )" : "")}
+                    {name + (description && !nodate ? " ( le " + moment(description.date).format("DD/MM/YY") + " )" : "")}
                 </Text>
                 <TouchableHighlight
                     onPress={() => handleDoubleTap(description)}

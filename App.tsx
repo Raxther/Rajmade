@@ -57,7 +57,9 @@ export default function App() {
     }
 
     async function clearNotifications() {
+        await Notifications.cancelAllScheduledNotificationsAsync();
         await Notifications.dismissAllNotificationsAsync();
+        console.log("Notification cleared.");
     }
 
     async function setNotification() {
@@ -69,7 +71,6 @@ export default function App() {
       `,
             )
             .single();
-
         const trigger = new Date(Date.now() + 8 * 60 * 60 * 1000);
         trigger.setMinutes(0);
         trigger.setSeconds(0);
@@ -80,6 +81,8 @@ export default function App() {
             },
             trigger,
         });
+        console.log("Notification setted.");
+
     }
 
     getNotificationPermission();
